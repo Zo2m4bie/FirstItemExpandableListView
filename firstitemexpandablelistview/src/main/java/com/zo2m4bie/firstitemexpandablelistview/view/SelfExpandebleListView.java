@@ -238,16 +238,21 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
         addViewInLayout(child, position, params, true);//sdd view with normal parameters
         int itemWidth = getWidth();
 
-       if(position == 0){
-            child.measure(MeasureSpec.EXACTLY | itemWidth, MeasureSpec.EXACTLY |  mMixMinController.getMaxValue());
-            mCurrentChanging = (ISelfExpandableHolder)getChildAt(1).getTag();
-        } else if(position == -1 && childCount == 0){
-           child.measure(MeasureSpec.EXACTLY | itemWidth, MeasureSpec.EXACTLY |  mMixMinController.getMaxValue());
+        if (position == 0) {
+            child.measure(MeasureSpec.EXACTLY | itemWidth, MeasureSpec.EXACTLY | mMixMinController.getMaxValue());
+            mCurrentChanging = (ISelfExpandableHolder) getChildAt(1).getTag();
+            if(childCount > 1){
+                View childSecond = getChildAt(1);
+                mMixMinController.measureAndSaveMinValue(childSecond, getWidth());
+            }
+        } else if (position == -1 && childCount == 0) {
+            child.measure(MeasureSpec.EXACTLY | itemWidth, MeasureSpec.EXACTLY | mMixMinController.getMaxValue());
 
-       } else if(position == -1 ){ // add item to bottom. it means we add in bottom size
-           mMixMinController.measureToMinValue(child, getWidth());
-            if(childCount == 1){
-                mCurrentChanging = (ISelfExpandableHolder)child.getTag();
+        } else if (position == -1) { // add item to bottom. it means we add in bottom size
+            mMixMinController.measureToMinValue(child, getWidth());
+            if (childCount == 1) {
+                mMixMinController.measureAndSaveMinValue(child, getWidth());
+                mCurrentChanging = (ISelfExpandableHolder) child.getTag();
             }
         }
     }
@@ -313,6 +318,7 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
             Log.d("TEST", "RemoveTopItem = " + mOffsetFromTopItem);
             tmpView = getChildAt(1);
             if(tmpView != null){
+                mMixMinController.setSecondItemHeight(tmpView.getMeasuredHeight());
                 mCurrentChanging = (ISelfExpandableHolder) tmpView.getTag();
             }
         }

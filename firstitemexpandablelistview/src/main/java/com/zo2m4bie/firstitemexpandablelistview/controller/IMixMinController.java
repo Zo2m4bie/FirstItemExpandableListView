@@ -20,4 +20,10 @@ public interface IMixMinController {
     int getDifferentMaxMin(int minV);
 
     void measureToMinValue(View tmpView, int viewWidth);
+
+    void setSecondItemHeight(int measuredHeight);
+
+    int getSecondItemMinHeight();
+
+    void measureAndSaveMinValue(View childSecond, int width);
 }

@@ -55,4 +55,19 @@ public class MaxMinController implements IMixMinController{
     public void measureToMinValue(View tmpView, int viewWidth) {
         tmpView.measure(View.MeasureSpec.EXACTLY | viewWidth, View.MeasureSpec.EXACTLY | mMinValue);
     }
+
+    @Override
+    public void setSecondItemHeight(int measuredHeight) {
+
+    }
+
+    @Override
+    public int getSecondItemMinHeight() {
+        return mMinValue;
+    }
+
+    @Override
+    public void measureAndSaveMinValue(View childSecond, int width) {
+
+    }
 }

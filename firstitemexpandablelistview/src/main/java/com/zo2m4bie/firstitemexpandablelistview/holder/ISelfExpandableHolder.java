@@ -6,4 +6,5 @@ package com.zo2m4bie.firstitemexpandablelistview.holder;
 public interface ISelfExpandableHolder {
 
     void heightPercentage(int percent);
+
 }
