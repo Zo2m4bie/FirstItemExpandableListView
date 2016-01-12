@@ -3,26 +3,24 @@ package com.zo2m4bie.firstitemexpandablelistview.controller;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import com.zo2m4bie.firstitemexpandablelistview.R;
 
-
 /**
- * Created by dima on 1/10/16.
+ * Created by dima on 1/11/16.
  */
-public class HaveMaxController implements IMixMinController{
+public class HaveMinController implements IMixMinController{
 
-    private int mMaxValue, mHalfMax;
-    private int mSecondItemHeight;
+    private int mMinValue;//, mHalfMax;
+    private int mSecondItemMaxHeight, mFirstItemMaxHeight;
 
     @Override
     public void init(Context context, AttributeSet attrs) {
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.SelfExpandebleListView, 0, 0);
         try {
-            mMaxValue = (int) ta.getDimension(R.styleable.SelfExpandebleListView_itemMaxHeight, 0);
-            mHalfMax = mMaxValue / 2;
-
+            mMinValue = (int) ta.getDimension(R.styleable.SelfExpandebleListView_itemMinHeight, 0);
         } finally {
             ta.recycle();
         }
@@ -30,31 +28,28 @@ public class HaveMaxController implements IMixMinController{
 
     @Override
     public int getHalfMax() {
-        return mHalfMax;
+        return mSecondItemMaxHeight / 2;
     }
 
-
     @Override
-    /**
-     * Fix me it wrong
-     */
     public int getMinValue(View child) {
-        return child.getMeasuredHeight();
+        return mMinValue;
     }
 
     @Override
     public int getDifferentMaxMin(int minV) {
-        return mMaxValue - minV;
+        return mSecondItemMaxHeight - mMinValue;
     }
 
     @Override
     public void measureToMinValue(View tmpView, int viewWidth) {
-        tmpView.measure(View.MeasureSpec.EXACTLY | viewWidth, View.MeasureSpec.UNSPECIFIED);
+        tmpView.measure(View.MeasureSpec.EXACTLY | viewWidth, View.MeasureSpec.EXACTLY | mMinValue);
     }
 
     @Override
     public void setSecondItemHeight(View view, int width) {
-        mSecondItemHeight = view.getMeasuredHeight();
+        view.measure(View.MeasureSpec.EXACTLY | width, View.MeasureSpec.UNSPECIFIED);
+        mSecondItemMaxHeight = view.getMeasuredHeight();
     }
 
     @Override
@@ -64,34 +59,34 @@ public class HaveMaxController implements IMixMinController{
 
     @Override
     public int getSecondItemMinHeight() {
-        return mSecondItemHeight;
+        return mMinValue;
     }
 
     @Override
     public void measureSecondItem(View tmpView, int width) {
         tmpView.measure(View.MeasureSpec.EXACTLY | width, View.MeasureSpec.UNSPECIFIED);
-        mSecondItemHeight = tmpView.getMeasuredHeight();
+        mSecondItemMaxHeight = tmpView.getMeasuredHeight();
     }
 
     @Override
     public void measureFirstItemToMax(View tmpView, int width) {
-        tmpView.measure(View.MeasureSpec.EXACTLY | width, View.MeasureSpec.EXACTLY | mMaxValue);
+        tmpView.measure(View.MeasureSpec.EXACTLY | width, View.MeasureSpec.UNSPECIFIED);
+        mFirstItemMaxHeight = tmpView.getMeasuredHeight();
     }
 
     @Override
-    public void measureFirstItem(View tmpView, int width) {
-        tmpView.measure(View.MeasureSpec.EXACTLY | width, View.MeasureSpec.EXACTLY | mMaxValue);
+    public void measureFirstItem(View child, int itemWidth) {
+        child.measure(View.MeasureSpec.EXACTLY | itemWidth, View.MeasureSpec.UNSPECIFIED);
+        mFirstItemMaxHeight = child.getMeasuredHeight();
     }
 
     @Override
     public int getFirstItemMaxValue() {
-        return mMaxValue;
+        return mFirstItemMaxHeight;
     }
 
     @Override
     public float getSecondItemMaxValue() {
-        return mMaxValue;
+        return mSecondItemMaxHeight;
     }
-
-
 }

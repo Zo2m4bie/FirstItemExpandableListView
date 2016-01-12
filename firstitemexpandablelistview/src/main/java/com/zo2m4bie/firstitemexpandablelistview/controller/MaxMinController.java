@@ -37,11 +37,6 @@ public class MaxMinController implements IMixMinController{
     }
 
     @Override
-    public int getMaxValue() {
-        return mMaxValue;
-    }
-
-    @Override
     public int getMinValue(View child) {
         return mMinValue;
     }
@@ -57,7 +52,12 @@ public class MaxMinController implements IMixMinController{
     }
 
     @Override
-    public void setSecondItemHeight(int measuredHeight) {
+    public void setSecondItemHeight(View view, int width) {
+
+    }
+
+    @Override
+    public void setFirstItemHeight(View view) {
 
     }
 
@@ -67,7 +67,28 @@ public class MaxMinController implements IMixMinController{
     }
 
     @Override
-    public void measureAndSaveMinValue(View childSecond, int width) {
+    public void measureSecondItem(View tmpView, int width) {
 
     }
+
+    @Override
+    public void measureFirstItemToMax(View tmpView, int width) {
+        tmpView.measure(View.MeasureSpec.EXACTLY | width, View.MeasureSpec.EXACTLY | mMaxValue);
+    }
+
+    @Override
+    public void measureFirstItem(View child, int itemWidth) {
+        child.measure(View.MeasureSpec.EXACTLY | itemWidth, View.MeasureSpec.EXACTLY | mMaxValue);
+    }
+
+    @Override
+    public int getFirstItemMaxValue() {
+        return mMaxValue;
+    }
+
+    @Override
+    public float getSecondItemMaxValue() {
+        return mMaxValue;
+    }
+
 }

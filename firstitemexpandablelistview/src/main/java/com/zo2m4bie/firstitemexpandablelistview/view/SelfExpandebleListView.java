@@ -15,6 +15,7 @@ import android.widget.Scroller;
 import com.zo2m4bie.firstitemexpandablelistview.R;
 import com.zo2m4bie.firstitemexpandablelistview.adapter.IMyAdapter;
 import com.zo2m4bie.firstitemexpandablelistview.controller.HaveMaxController;
+import com.zo2m4bie.firstitemexpandablelistview.controller.HaveMinController;
 import com.zo2m4bie.firstitemexpandablelistview.controller.IMixMinController;
 import com.zo2m4bie.firstitemexpandablelistview.controller.MaxMinController;
 import com.zo2m4bie.firstitemexpandablelistview.holder.ISelfExpandableHolder;
@@ -25,6 +26,7 @@ import com.zo2m4bie.firstitemexpandablelistview.holder.ISelfExpandableHolder;
 public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
 
     public static final String HAVE_MAX = "HAVE_MAX";
+    public static final String HAVE_MIN = "HAVE_MIN";
     public static final String HAVE_MAX_MIN = "HAVE_MAX_MIN";
 
     /** Distance to drag before we intercept touch events */
@@ -82,6 +84,8 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
                 mMixMinController = new MaxMinController();
             } else if(HAVE_MAX.equals(type)){
                 mMixMinController = new HaveMaxController();
+            } else if(HAVE_MIN.equals(type)){
+                mMixMinController = new HaveMinController();
             } else {
                 throw new IllegalArgumentException("You didn't set up max min type or did it wrong. minMaxType has to be HAVE_MAX or HAVE_MAX_MIN");
             }
@@ -203,7 +207,7 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
             mFirstVisibleItem--;
             View newBottomChild = mAdapter.getView(mFirstVisibleItem, null, this, 100);
             addAndMeasureChild(newBottomChild, 0);
-            mOffsetFromTopItem -= mMixMinController.getMaxValue();
+            mOffsetFromTopItem -= mMixMinController.getFirstItemMaxValue();
         }
     }
 
@@ -239,19 +243,20 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
         int itemWidth = getWidth();
 
         if (position == 0) {
-            child.measure(MeasureSpec.EXACTLY | itemWidth, MeasureSpec.EXACTLY | mMixMinController.getMaxValue());
+            mMixMinController.measureFirstItem(child, itemWidth);
             mCurrentChanging = (ISelfExpandableHolder) getChildAt(1).getTag();
-            if(childCount > 1){
+            if(childCount > 1){// first become second
                 View childSecond = getChildAt(1);
-                mMixMinController.measureAndSaveMinValue(childSecond, getWidth());
+                mMixMinController.measureSecondItem(childSecond, itemWidth);
+//                ыва mMixMinController.measureAndSaveMinValue(childSecond, getWidth());
             }
         } else if (position == -1 && childCount == 0) {
-            child.measure(MeasureSpec.EXACTLY | itemWidth, MeasureSpec.EXACTLY | mMixMinController.getMaxValue());
+            mMixMinController.measureFirstItem(child, itemWidth);
 
         } else if (position == -1) { // add item to bottom. it means we add in bottom size
             mMixMinController.measureToMinValue(child, getWidth());
-            if (childCount == 1) {
-                mMixMinController.measureAndSaveMinValue(child, getWidth());
+            if (childCount == 1) {// second item
+                mMixMinController.measureSecondItem(child, getWidth());
                 mCurrentChanging = (ISelfExpandableHolder) child.getTag();
             }
         }
@@ -277,14 +282,14 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
             int left = 0;//(getWidth() - width) / 2;
             int topUse = top;
             if(index == 0){ //if it's first item. It allways have max height value
-                height = mMixMinController.getMaxValue();
+                height = mMixMinController.getFirstItemMaxValue();
                 if((childCount - 1) == mFirstVisibleItem && topUse < 0){
                     topUse = 0;
                 }
             }else if(index == 1){// second item it have floating height
                 int minV = mMixMinController.getMinValue(child);
                 int diff = mMixMinController.getDifferentMaxMin(minV);
-                height = (int) (((float)diff)/mMixMinController.getMaxValue() * mOffsetFromTopItem * -1);
+                height = (int) (((float)diff)/mMixMinController.getSecondItemMaxValue() * mOffsetFromTopItem * -1);
                 mCurrentChanging.heightPercentage((height * 100) / diff);
                 height += minV;
                 child.measure(MeasureSpec.EXACTLY | getWidth(), MeasureSpec.EXACTLY | height);
@@ -310,7 +315,7 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
             Log.d("TEST", "RemoveTopItem = " + firstChild.getBottom());
             mOffsetFromTopItem += firstChild.getHeight();
             removeViewInLayout(firstChild);
-            tmpView.measure(MeasureSpec.EXACTLY | getWidth(), MeasureSpec.EXACTLY | mMixMinController.getMaxValue());
+            mMixMinController.measureFirstItemToMax(tmpView, getWidth());
             mCurrentChanging.heightPercentage(100);
             mFirstVisibleItem++;
             childCount--;
@@ -318,7 +323,7 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
             Log.d("TEST", "RemoveTopItem = " + mOffsetFromTopItem);
             tmpView = getChildAt(1);
             if(tmpView != null){
-                mMixMinController.setSecondItemHeight(tmpView.getMeasuredHeight());
+                mMixMinController.setSecondItemHeight(tmpView, getWidth());
                 mCurrentChanging = (ISelfExpandableHolder) tmpView.getTag();
             }
         }
@@ -452,8 +457,9 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
 
 
                 int top = getChildAt(0).getTop();
+                int firstMaxValue = mMixMinController.getFirstItemMaxValue();
                 Log.d("TEST", "changeTopPosition = " + top + " distance = " + distance);
-                distance = ((distance - top) > mMixMinController.getMaxValue()) ? (mMixMinController.getMaxValue() + top): distance;
+                distance = ((distance - top) > firstMaxValue) ? (firstMaxValue + top): distance;
             }else if(mFirstVisibleItem == (mAdapter.getCount() - 1)){
 
                 int top = getChildAt(0).getTop();
@@ -521,7 +527,7 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
 
         public SimplyRunnable(int scrollDistance){
             mScrollDistance = scrollDistance;
-            mPart = mMixMinController.getMaxValue() / ((mScrollDistance > 0) ? PART_OF_SCREEN_FOR_MOVE : -PART_OF_SCREEN_FOR_MOVE);
+            mPart = mMixMinController.getFirstItemMaxValue() / ((mScrollDistance > 0) ? PART_OF_SCREEN_FOR_MOVE : -PART_OF_SCREEN_FOR_MOVE);
             mPartAbs = Math.abs(mPart);
         }
 

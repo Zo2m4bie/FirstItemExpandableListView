@@ -13,17 +13,27 @@ public interface IMixMinController {
 
     int getHalfMax();
 
-    int getMaxValue();
-
     int getMinValue(View child);
 
     int getDifferentMaxMin(int minV);
 
     void measureToMinValue(View tmpView, int viewWidth);
 
-    void setSecondItemHeight(int measuredHeight);
+//    void setSecondItemHeight(int measuredHeight);
+
+    void setSecondItemHeight(View view, int width);
+
+    void setFirstItemHeight(View view);
 
     int getSecondItemMinHeight();
 
-    void measureAndSaveMinValue(View childSecond, int width);
+    void measureSecondItem(View tmpView, int width);
+
+    void measureFirstItemToMax(View tmpView, int width);
+
+    void measureFirstItem(View child, int itemWidth);
+
+    int getFirstItemMaxValue();
+
+    float getSecondItemMaxValue();
 }
