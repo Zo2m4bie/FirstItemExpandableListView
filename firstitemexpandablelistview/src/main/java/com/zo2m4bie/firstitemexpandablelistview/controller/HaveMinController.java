@@ -3,7 +3,6 @@ package com.zo2m4bie.firstitemexpandablelistview.controller;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import com.zo2m4bie.firstitemexpandablelistview.R;
@@ -72,12 +71,16 @@ public class HaveMinController implements IMixMinController{
     public void measureFirstItemToMax(View tmpView, int width) {
         tmpView.measure(View.MeasureSpec.EXACTLY | width, View.MeasureSpec.UNSPECIFIED);
         mFirstItemMaxHeight = tmpView.getMeasuredHeight();
+        //FIXME have some strange behavior with textview and gravity center if I use UNSPECIFIED
+        tmpView.measure(View.MeasureSpec.EXACTLY | width, View.MeasureSpec.EXACTLY | mFirstItemMaxHeight);
     }
 
     @Override
     public void measureFirstItem(View child, int itemWidth) {
         child.measure(View.MeasureSpec.EXACTLY | itemWidth, View.MeasureSpec.UNSPECIFIED);
         mFirstItemMaxHeight = child.getMeasuredHeight();
+        //FIXME have some strange behavior with textview and gravity center if I use UNSPECIFIED
+        child.measure(View.MeasureSpec.EXACTLY | itemWidth, View.MeasureSpec.EXACTLY | mFirstItemMaxHeight);
     }
 
     @Override
