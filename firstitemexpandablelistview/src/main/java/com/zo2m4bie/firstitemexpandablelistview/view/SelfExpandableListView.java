@@ -1,33 +1,29 @@
 package com.zo2m4bie.firstitemexpandablelistview.view;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.AdapterView;
-import android.widget.Scroller;
 
 import com.zo2m4bie.firstitemexpandablelistview.R;
-import com.zo2m4bie.firstitemexpandablelistview.adapter.IMyAdapter;
-import com.zo2m4bie.firstitemexpandablelistview.controller.HaveMaxController;
-import com.zo2m4bie.firstitemexpandablelistview.controller.HaveMinController;
-import com.zo2m4bie.firstitemexpandablelistview.controller.IMixMinController;
-import com.zo2m4bie.firstitemexpandablelistview.controller.MaxMinController;
+import com.zo2m4bie.firstitemexpandablelistview.adapter.IFirstExpandableAdapter;
+import com.zo2m4bie.firstitemexpandablelistview.controller.ControllerFabric;
+import com.zo2m4bie.firstitemexpandablelistview.controller.Flinger;
+import com.zo2m4bie.firstitemexpandablelistview.controller.IMaxMinController;
 import com.zo2m4bie.firstitemexpandablelistview.holder.ISelfExpandableHolder;
+import com.zo2m4bie.firstitemexpandablelistview.listener.ScrollAnimatorListener;
+import com.zo2m4bie.firstitemexpandablelistview.utils.AnimatorsUtils;
 
 /**
  * Created by dima on 1/6/16.
  */
-public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
-
-    public static final String HAVE_MAX = "HAVE_MAX";
-    public static final String HAVE_MIN = "HAVE_MIN";
-    public static final String HAVE_MAX_MIN = "HAVE_MAX_MIN";
+public class SelfExpandableListView extends AdapterView<IFirstExpandableAdapter> {
 
     /** Distance to drag before we intercept touch events */
     private static final int TOUCH_SCROLL_THRESHOLD = 10;
@@ -48,7 +44,7 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
     private static final int INVALID_INDEX = -1;
 
     private int mFirstVisibleItem;
-    private IMixMinController mMixMinController;
+    private IMaxMinController mMaxMinController;
 
     //it's offset to current(visible) first item
     private int mOffsetFromTopItem;
@@ -60,51 +56,40 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
 
     private int mHalfScreen;
 
-    private IMyAdapter mAdapter;
+    private IFirstExpandableAdapter mAdapter;
     private ISelfExpandableHolder mCurrentChanging;
 
     private VelocityTracker velocityTracker;
-    private int minimumVelocity;
-    private int maximumVelocity;
-    private Flinger flinger;
+    private int mMinimumVelocity;
+    private int mMaximumVelocity;
+    private Flinger mFlinger;
 
-    private SimplyRunnable mSimplyRunnable;
+    // This animator help this view to scroll to top of bigger item
+    private ValueAnimator mScrollAnimator;
 
-    public SelfExpandebleListView(Context context, AttributeSet attrs) {
+    public SelfExpandableListView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initMinMaxConteoller(attrs);
-        init(attrs);
+        init();
     }
 
     private void initMinMaxConteoller(AttributeSet attrs) {
-        TypedArray ta = getContext().obtainStyledAttributes(attrs, R.styleable.SelfExpandebleListView, 0, 0);
+        TypedArray ta = getContext().obtainStyledAttributes(attrs, R.styleable.SelfExpandableListView, 0, 0);
         try {
-            String type = ta.getString(R.styleable.SelfExpandebleListView_minMaxType);
-            if(HAVE_MAX_MIN.equals(type)){
-                mMixMinController = new MaxMinController();
-            } else if(HAVE_MAX.equals(type)){
-                mMixMinController = new HaveMaxController();
-            } else if(HAVE_MIN.equals(type)){
-                mMixMinController = new HaveMinController();
-            } else {
-                throw new IllegalArgumentException("You didn't set up max min type or did it wrong. minMaxType has to be HAVE_MAX or HAVE_MAX_MIN");
-            }
-
-
+            String type = ta.getString(R.styleable.SelfExpandableListView_minMaxType);
+            mMaxMinController = ControllerFabric.getMinMaxController(type);
+            mMaxMinController.init(getContext(), attrs);
         } finally {
             ta.recycle();
         }
     }
 
-    public void init(AttributeSet attrs){
+    public void init(){
         mFirstVisibleItem = 0;
-
         final ViewConfiguration configuration = ViewConfiguration.get(getContext());
-        this.minimumVelocity = configuration.getScaledMinimumFlingVelocity();
-        this.maximumVelocity = configuration.getScaledMaximumFlingVelocity();
-        flinger = new Flinger(getContext());
-
-        mMixMinController.init(getContext(), attrs);
+        this.mMinimumVelocity = configuration.getScaledMinimumFlingVelocity();
+        this.mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
+        mFlinger = new Flinger(getContext(), this);
     }
 
     @Override
@@ -114,12 +99,12 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
     }
 
     @Override
-    public IMyAdapter getAdapter() {
+    public IFirstExpandableAdapter getAdapter() {
         return mAdapter;
     }
 
     @Override
-    public void setAdapter(IMyAdapter adapter) {
+    public void setAdapter(IFirstExpandableAdapter adapter) {
         mAdapter = adapter;
         removeAllViewsInLayout();
         requestLayout();
@@ -128,19 +113,19 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        Log.d("MotionEvent", "draw start");
         if (mAdapter == null) {
             return;
         }
+        int offsetFromTopVisibleItem = mOffsetFromTopItem;
         removeExtraChild();
         fillUp();
-        fillListDown();
+        fillListDown(offsetFromTopVisibleItem);
         positionItems();
 
     }
 
-    private void scroolToItemStartIfNeeded() {
-        removeCallbacks(mSimplyRunnable);
+    private void scrollToItemStartIfNeeded() {
+        stopAnimator();
         int firstTop = getChildAt(0).getTop();
         if(firstTop == 0){
             return;
@@ -149,7 +134,7 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
         int distance = 0;
         if (secondView != null) {
             int height = secondView.getHeight();
-            if (mMixMinController.getHalfMax() < (height)) { //bottom to top
+            if (mMaxMinController.getHalfMax() < (height)) { //bottom to top
                 distance = secondView.getTop();
             } else { // top to bottom
                 distance = firstTop;
@@ -158,13 +143,25 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
             distance = firstTop;
         }
         if (distance != 0) {
-            mSimplyRunnable = new SimplyRunnable(distance);
-            post(mSimplyRunnable);
+            startAnimator(distance);
         }
     }
 
-    private void scroolToItemStartIfNeeded(int lastDiff) {
-        removeCallbacks(mSimplyRunnable);
+    public void stopAnimator(){
+        if(mScrollAnimator != null){
+            AnimatorsUtils.cancelAnimator(mScrollAnimator);
+            mScrollAnimator = null;
+        }
+    }
+
+    public void startAnimator(int distance){
+        mScrollAnimator = AnimatorsUtils.createAnimator(distance, new ScrollAnimatorListener(this));
+        mScrollAnimator.start();
+
+    }
+
+    public void scrollToItemStartIfNeeded(int lastDiff) {
+        stopAnimator();
         int firstTop = getChildAt(0).getTop();
         if(firstTop == 0){
             return;
@@ -179,8 +176,7 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
             }
         }
         if (distance != 0) {
-            mSimplyRunnable = new SimplyRunnable(distance);
-            post(mSimplyRunnable);
+            startAnimator(distance);
         }
     }
 
@@ -191,28 +187,26 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
 
     @Override
     public void setSelection(int position) {
-
     }
 
     private void fillUp() {
-
         View firstChild = getChildAt(0);
 
         while( mFirstVisibleItem > 0 && firstChild != null && (mOffsetFromTopItem)  > 0) {
             View tmpView = getChildAt(1);
             if(tmpView != null) {
-                mMixMinController.measureToMinValue(tmpView, getWidth());
+                mMaxMinController.measureToMinValue(tmpView, getWidth());
+
                 mCurrentChanging.heightPercentage(0);
             }
             mFirstVisibleItem--;
             View newBottomChild = mAdapter.getView(mFirstVisibleItem, null, this, 100);
             addAndMeasureChild(newBottomChild, 0);
-            mOffsetFromTopItem -= mMixMinController.getFirstItemMaxValue();
+            mOffsetFromTopItem -= mMaxMinController.getFirstItemMaxValue();
         }
     }
 
-    private void fillListDown() {
-
+    private void fillListDown(int mOffsetFromTopItem) {
         int childLastPosition = getChildCount() - 1;
         View lastChild = getChildAt(childLastPosition);
         int endPosition = getChildCount() + mFirstVisibleItem - 1;
@@ -222,8 +216,6 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
         }
         int itemsCount = mAdapter.getCount()-1;
         while (bottom < getHeight() && endPosition < itemsCount ) {
-
-            Log.d("tag", "fillDown");
             endPosition++;
             View newBottomChild = mAdapter.getView(endPosition, null, this, (endPosition == 0) ? 100 : 0);
             addAndMeasureChild(newBottomChild, -1);
@@ -232,7 +224,6 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
     }
 
     private void addAndMeasureChild(View child, int position) {
-        Log.d("tag", "addAndMeasureChild");
         int childCount = getChildCount();
         LayoutParams params = child.getLayoutParams();
         if (params == null) { // calculate normal height
@@ -243,20 +234,19 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
         int itemWidth = getWidth();
 
         if (position == 0) {
-            mMixMinController.measureFirstItem(child, itemWidth);
+            mMaxMinController.measureFirstItem(child, itemWidth);
             mCurrentChanging = (ISelfExpandableHolder) getChildAt(1).getTag();
             if(childCount > 1){// first become second
                 View childSecond = getChildAt(1);
-                mMixMinController.measureSecondItem(childSecond, itemWidth);
-//                ыва mMixMinController.measureAndSaveMinValue(childSecond, getWidth());
+                mMaxMinController.measureSecondItem(childSecond, itemWidth);
             }
         } else if (position == -1 && childCount == 0) {
-            mMixMinController.measureFirstItem(child, itemWidth);
+            mMaxMinController.measureFirstItem(child, itemWidth);
 
         } else if (position == -1) { // add item to bottom. it means we add in bottom size
-            mMixMinController.measureToMinValue(child, getWidth());
+            mMaxMinController.measureToMinValue(child, getWidth());
             if (childCount == 1) {// second item
-                mMixMinController.measureSecondItem(child, getWidth());
+                mMaxMinController.measureSecondItem(child, getWidth());
                 mCurrentChanging = (ISelfExpandableHolder) child.getTag();
             }
         }
@@ -271,33 +261,32 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
             return;
         }
         int top = mOffsetFromTopItem;
-        Log.d("TEST", "positionItems = " + mOffsetFromTopItem);
-
-        Log.d("tag", "positionItems");
+        float secondItempercent = 0;
         for (int index = 0; index < childCount; index++) {
             View child = getChildAt(index);
 
             int width = child.getMeasuredWidth();
-            int height = 0;//mMaxValue;//child.getMeasuredHeight();
-            int left = 0;//(getWidth() - width) / 2;
+            int height = 0;
+            int left = 0;
             int topUse = top;
             if(index == 0){ //if it's first item. It allways have max height value
-                height = mMixMinController.getFirstItemMaxValue();
-                if((childCount - 1) == mFirstVisibleItem && topUse < 0){
+                height = mMaxMinController.getFirstItemMaxValue();
+                if((childCount - 1) == mFirstVisibleItem && topUse < 0){ // if it's last item
                     topUse = 0;
                 }
+                secondItempercent = 1 - ((float)(topUse + height)) / height;
             }else if(index == 1){// second item it have floating height
-                int minV = mMixMinController.getMinValue(child);
-                int diff = mMixMinController.getDifferentMaxMin(minV);
-                height = (int) (((float)diff)/mMixMinController.getSecondItemMaxValue() * mOffsetFromTopItem * -1);
-                mCurrentChanging.heightPercentage((height * 100) / diff);
+                int minV = mMaxMinController.getMinValue(child);
+                int diff = mMaxMinController.getDifferentMaxMin(minV);
+                height = (int) (diff * secondItempercent);
+
+                mCurrentChanging.heightPercentage(secondItempercent);
                 height += minV;
                 child.measure(MeasureSpec.EXACTLY | getWidth(), MeasureSpec.EXACTLY | height);
             } else { // else items have min height
-                height = mMixMinController.getMinValue(child);//mMinValue;
+                height = mMaxMinController.getMinValue(child);
             }
 
-            Log.d("heightissues",  index + " measuredheight = " + child.getMeasuredHeight() + " position height = " + height + " mOffsetFromTopItem = " + mOffsetFromTopItem + " mFirstVisibleItem = " + mFirstVisibleItem);
             child.layout(left, topUse, left + width, topUse + height);
             top += height;
         }
@@ -309,39 +298,67 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
     private void removeExtraChild(){
         View firstChild = getChildAt(0);
         int childCount = getChildCount();
-
         View tmpView = getChildAt(1); // second view
-        while(tmpView != null && firstChild.getBottom() <= 0){
-            Log.d("TEST", "RemoveTopItem = " + firstChild.getBottom());
-            mOffsetFromTopItem += firstChild.getHeight();
+        while(tmpView != null && (mOffsetFromTopItem + mMaxMinController.getFirstItemMaxValue()) <= 0){
+            mOffsetFromTopItem += mMaxMinController.getFirstItemMaxValue();
             removeViewInLayout(firstChild);
-            mMixMinController.measureFirstItemToMax(tmpView, getWidth());
+            mMaxMinController.measureFirstItemToMax(tmpView, getWidth());
             mCurrentChanging.heightPercentage(100);
             mFirstVisibleItem++;
             childCount--;
             firstChild = tmpView;
-            Log.d("TEST", "RemoveTopItem = " + mOffsetFromTopItem);
             tmpView = getChildAt(1);
             if(tmpView != null){
-                mMixMinController.setSecondItemHeight(tmpView, getWidth());
+                mMaxMinController.setSecondItemHeight(tmpView, getWidth());
                 mCurrentChanging = (ISelfExpandableHolder) tmpView.getTag();
             }
         }
 
         tmpView = getChildAt(childCount - 1); // last view
         while(tmpView != null && tmpView.getTop() >= getHeight()){
-            Log.d("TEST", "RemoveBottomItem = " + tmpView.getTop() + " getHeight() = " + getHeight());
             removeViewInLayout(tmpView);
             childCount--;
             tmpView = getChildAt(childCount - 1);
         }
+    }
 
+    /**
+     * The method scrolls to @item
+     */
+    public void scrollToItem(int item){
+        int childCount = mAdapter.getCount();
+        if(childCount <= item){
+            //No such item in list
+            return;
+        }
+        scrollBy(0, getScrollDistanceTo(item));
+    }
 
+    /**
+     * The method scrolls to @item
+    */
+    public void scrollToAnimated(int item){
+        int childCount = mAdapter.getCount();
+        if(childCount <= item){
+            //No such item in list
+            return;
+        }
+        startAnimator(getScrollDistanceTo(item));
+    }
+
+    private int getScrollDistanceTo(int item){
+        int scroll = mOffsetFromTopItem + mMaxMinController.getFirstItemMaxValue();
+        if((item - mFirstVisibleItem) > 1) {
+            scroll += mMaxMinController.getSecondItemMaxValue();
+            for (int i = (mFirstVisibleItem + 2); i < item; i++) {
+                scroll += mMaxMinController.getMaxVauleFor(getChildAt(i), getWidth());
+            }
+        }
+        return scroll;
     }
 
     @Override
     public void scrollBy(int x, int y) {
-        Log.d("Fliper", "ScrollBy x = " + x + " y = " + y);
         if(changeTopPosition(y)){
             requestLayout();
         }
@@ -359,12 +376,10 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                Log.d("MotionEvent", "Down");
                 startTouch(event);
                 break;
 
             case MotionEvent.ACTION_MOVE:
-                Log.d("MotionEvent", "Move");
 
                 if (mTouchState == TOUCH_STATE_CLICK) {
                     startScrollIfNeeded(event);
@@ -380,23 +395,21 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
 
             case MotionEvent.ACTION_UP:
                 if (mTouchState == TOUCH_STATE_CLICK) {
-                    Log.d("MotionEvent", "mTouchState == TOUCH_STATE_CLICK");
                     clickChildAt((int)event.getX(), (int)event.getY());
                 } else {
                     final VelocityTracker velocityTracker = this.velocityTracker;
-                    velocityTracker.computeCurrentVelocity(1000, maximumVelocity);
+                    velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
                     int velocityX = (int) velocityTracker.getXVelocity();
                     int velocityY = (int) velocityTracker.getYVelocity();
-                    Log.d("Fliper", "velocityX " + velocityX + " velocityY = " + velocityY);
 
-                    if (Math.abs(velocityY) > minimumVelocity) {
-                        flinger.start(0, -mOffsetFromTop, velocityX, velocityY, 0, -mOffsetFromTop  * getHeight());
+                    if (Math.abs(velocityY) > mMinimumVelocity) {
+                        mFlinger.start(0, -mOffsetFromTop, velocityX, velocityY, 0, -mOffsetFromTop  * getHeight());
                     } else {
                         if (this.velocityTracker != null) { // If the velocity less than threshold
                             this.velocityTracker.recycle(); // recycle the tracker
                             this.velocityTracker = null;
                         }
-                        scroolToItemStartIfNeeded();
+                        scrollToItemStartIfNeeded();
                     }
                 }
                 endTouch();
@@ -457,8 +470,7 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
 
 
                 int top = getChildAt(0).getTop();
-                int firstMaxValue = mMixMinController.getFirstItemMaxValue();
-                Log.d("TEST", "changeTopPosition = " + top + " distance = " + distance);
+                int firstMaxValue = mMaxMinController.getFirstItemMaxValue();
                 distance = ((distance - top) > firstMaxValue) ? (firstMaxValue + top): distance;
             }else if(mFirstVisibleItem == (mAdapter.getCount() - 1)){
 
@@ -466,7 +478,6 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
                 if (top == 0) {//TODO remove get child at
                     return false;
                 }
-                Log.d("TEST", "changeTopPosition = " + top + " distance = " + distance);
                 distance = (distance > top) ? top : distance;
             }
         }
@@ -476,9 +487,8 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
     }
 
     private void startTouch(final MotionEvent event) {
-
-        removeCallbacks(mSimplyRunnable);
-        flinger.forceFinished();
+        stopAnimator();
+        mFlinger.forceFinished();
         // save the start place
         mTouchStartX = (int)event.getX();
         mTouchStartY = (int)event.getY();
@@ -517,88 +527,4 @@ public class SelfExpandebleListView extends AdapterView<IMyAdapter> {
         }
     }
 
-    class SimplyRunnable implements Runnable {
-
-        public static final int PART_OF_SCREEN_FOR_MOVE = 10;
-
-        int mScrollDistance=0;
-        int mPart = 1;
-        int mPartAbs = 1;
-
-        public SimplyRunnable(int scrollDistance){
-            mScrollDistance = scrollDistance;
-            mPart = mMixMinController.getFirstItemMaxValue() / ((mScrollDistance > 0) ? PART_OF_SCREEN_FOR_MOVE : -PART_OF_SCREEN_FOR_MOVE);
-            mPartAbs = Math.abs(mPart);
-        }
-
-        @Override
-        public void run() {
-            if(mScrollDistance != 0){
-                if(Math.abs(mScrollDistance) < mPartAbs){
-                    mPart = mScrollDistance;
-                }
-                mScrollDistance -= mPart;
-                scrollBy(0, mPart);
-                // the list is not at rest, so schedule a new frame
-                postDelayed(this, 1);
-            }
-        }
-    }
-
-    // http://stackoverflow.com/a/6219382/842697
-    private class Flinger implements Runnable {
-        private final Scroller scroller;
-
-        private int lastX = 0;
-        private int lastY = 0;
-        private int lastDiff = 0;
-
-        Flinger(Context context) {
-            scroller = new Scroller(context);
-        }
-
-        void start(int initX, int initY, int initialVelocityX, int initialVelocityY, int maxX, int maxY) {
-            scroller.fling(initX, initY, initialVelocityX, initialVelocityY, 0, maxX, 0, maxY);
-
-            lastX = initX;
-            lastY = initY;
-            post(this);
-        }
-
-        public void run() {
-            if (scroller.isFinished()) {
-                scroolToItemStartIfNeeded(lastDiff);
-                return;
-            }
-
-            boolean more = scroller.computeScrollOffset();
-            int x = scroller.getCurrX();
-            int y = scroller.getCurrY();
-            int diffX = lastX - x;
-            int diffY = lastY - y;
-            if (diffX != 0 || diffY != 0) {
-                Log.d("Fliper", "Y = " + y + " lastX = " + lastY + " diffY = " + diffY + " moffset " + mOffsetFromTop);
-                scrollBy(diffX, diffY);
-                lastX = x;
-                lastY = y;
-                lastDiff = diffY;
-            }
-
-            if (more) {
-                post(this);
-            } else {
-                scroolToItemStartIfNeeded(lastDiff);
-            }
-        }
-
-        boolean isFinished() {
-            return scroller.isFinished();
-        }
-
-        void forceFinished() {
-            if (!scroller.isFinished()) {
-                scroller.forceFinished(true);
-            }
-        }
-    }
 }

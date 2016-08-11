@@ -10,29 +10,29 @@ import java.util.List;
 /**
  * Created by dima on 1/8/16.
  */
-public abstract class IMyAdapter<T> extends ArrayAdapter<T> {
+public abstract class IFirstExpandableAdapter<T> extends ArrayAdapter<T> {
 
-    public IMyAdapter(Context context, int resource) {
+    public IFirstExpandableAdapter(Context context, int resource) {
         super(context, resource);
     }
 
-    public IMyAdapter(Context context, int resource, int textViewResourceId) {
+    public IFirstExpandableAdapter(Context context, int resource, int textViewResourceId) {
         super(context, resource, textViewResourceId);
     }
 
-    public IMyAdapter(Context context, int resource, T[] objects) {
+    public IFirstExpandableAdapter(Context context, int resource, T[] objects) {
         super(context, resource, objects);
     }
 
-    public IMyAdapter(Context context, int resource, int textViewResourceId, T[] objects) {
+    public IFirstExpandableAdapter(Context context, int resource, int textViewResourceId, T[] objects) {
         super(context, resource, textViewResourceId, objects);
     }
 
-    public IMyAdapter(Context context, int resource, List<T> objects) {
+    public IFirstExpandableAdapter(Context context, int resource, List<T> objects) {
         super(context, resource, objects);
     }
 
-    public IMyAdapter(Context context, int resource, int textViewResourceId, List<T> objects) {
+    public IFirstExpandableAdapter(Context context, int resource, int textViewResourceId, List<T> objects) {
         super(context, resource, textViewResourceId, objects);
     }
 

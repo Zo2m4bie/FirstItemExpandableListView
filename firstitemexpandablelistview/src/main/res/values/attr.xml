@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="SelfExpandebleListView">
+    <declare-styleable name="SelfExpandableListView">
         <attr name="itemMaxHeight" format="dimension"/>
         <attr name="itemMinHeight" format="dimension"/>
         <attr name="minMaxType" format="string"/>

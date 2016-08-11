@@ -8,13 +8,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.zo2m4bie.firstitemexpandablelistview.adapter.IMyAdapter;
+import com.zo2m4bie.firstitemexpandablelistview.adapter.IFirstExpandableAdapter;
 import com.zo2m4bie.firstitemexpandablelistview.holder.ISelfExpandableHolder;
 
 /**
  * Created by dima on 1/8/16.
  */
-public class MyAdapter extends IMyAdapter<String> {
+public class MyAdapter extends IFirstExpandableAdapter<String> {
 
     protected LayoutInflater mInflater;
 
@@ -31,6 +31,7 @@ public class MyAdapter extends IMyAdapter<String> {
         ViewHolder holder = (ViewHolder)convertView.getTag();
         holder.mTitle.setText(getItem(position));
         holder.mPicture.setAlpha((float)percent / 100);
+        holder.setPosition(position);
         return convertView;
     }
 
@@ -51,11 +52,16 @@ public class MyAdapter extends IMyAdapter<String> {
     static class ViewHolder implements ISelfExpandableHolder {
         TextView mTitle;
         ImageView mPicture;
+        int position;
+
+        public void setPosition(int position) {
+            this.position = position;
+        }
 
         @Override
-        public void heightPercentage(int percent) {
-            mPicture.setAlpha((float)percent / 100);
-            Log.d("Percentage", "percent = " + percent);
+        public void heightPercentage(float percent) {
+            mPicture.setAlpha(percent);
+            Log.d("Percentage", "percent = " + percent + " position" + position);
         }
     }
 

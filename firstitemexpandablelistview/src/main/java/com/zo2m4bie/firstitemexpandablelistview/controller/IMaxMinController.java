@@ -7,7 +7,7 @@ import android.view.View;
 /**
  * Created by dima on 1/10/16.
  */
-public interface IMixMinController {
+public interface IMaxMinController {
 
     void init(Context context, AttributeSet attrs);
 
@@ -36,4 +36,6 @@ public interface IMixMinController {
     int getFirstItemMaxValue();
 
     float getSecondItemMaxValue();
+
+    int getMaxVauleFor(View childAt, int itemWidth);
 }

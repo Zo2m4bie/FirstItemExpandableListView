@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:customNS="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    tools:context="zo2m4bie.com.myexpandlelistview.HaveMinActivity">
+
+    <com.zo2m4bie.firstitemexpandablelistview.view.SelfExpandableListView
+        android:id="@+id/my_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        customNS:minMaxType="HAVE_MIN"
+        customNS:itemMaxHeight="400px"
+        customNS:itemMinHeight="100px"
+        />
+
+</RelativeLayout>

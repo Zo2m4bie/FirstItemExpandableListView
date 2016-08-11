@@ -15,6 +15,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".HaveMaxActivity"/>
+        <activity android:name=".HaveMinActivity"/>
+        <activity android:name=".HaveMinMaxActivity"/>
     </application>
 
 </manifest>

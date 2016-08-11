@@ -11,18 +11,17 @@ import com.zo2m4bie.firstitemexpandablelistview.R;
 /**
  * Created by dima on 1/10/16.
  */
-public class HaveMaxController implements IMixMinController{
+public class HaveMaxController implements IMaxMinController {
 
     private int mMaxValue, mHalfMax;
     private int mSecondItemHeight;
 
     @Override
     public void init(Context context, AttributeSet attrs) {
-        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.SelfExpandebleListView, 0, 0);
+        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.SelfExpandableListView, 0, 0);
         try {
-            mMaxValue = (int) ta.getDimension(R.styleable.SelfExpandebleListView_itemMaxHeight, 0);
+            mMaxValue = (int) ta.getDimension(R.styleable.SelfExpandableListView_itemMaxHeight, 0);
             mHalfMax = mMaxValue / 2;
-
         } finally {
             ta.recycle();
         }
@@ -90,6 +89,11 @@ public class HaveMaxController implements IMixMinController{
 
     @Override
     public float getSecondItemMaxValue() {
+        return mMaxValue;
+    }
+
+    @Override
+    public int getMaxVauleFor(View childAt, int itemWidth) {
         return mMaxValue;
     }
 
