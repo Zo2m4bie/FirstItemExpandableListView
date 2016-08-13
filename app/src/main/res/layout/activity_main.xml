@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:widget="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:orientation="vertical"
     >
 
-    <Button
-        android:id="@+id/min_max"
-        android:layout_gravity="center"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="MIN MAX"/>
+    <com.zo2m4bie.floatingtoggle.FloatingToggleButton
+        android:id="@+id/select_state"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/settings_toggle_height"
+        android:layout_marginTop="30dp"
+        widget:backgrounddrawable="@drawable/layout_bg"
+        widget:dotdrawable="@drawable/pin_bg"
+        widget:statecount="3"
+        widget:text1="@string/min"
+        widget:text2="@string/minmax"
+        widget:text3="@string/max"
+        widget:textcolorfrom="@color/colorPrimary"
+        widget:textcolorto="@color/colorAccent"/>
 
     <Button
-        android:id="@+id/min"
-        android:layout_gravity="center"
+        android:id="@+id/start_activity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="MIN"/>
-
-    <Button
-        android:id="@+id/max"
         android:layout_gravity="center"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="MAX"
-        />
+        android:layout_margin="10dp"/>
 
+    <TextView
+        android:id="@+id/tv_description"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 </LinearLayout>

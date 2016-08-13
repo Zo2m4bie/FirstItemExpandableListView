@@ -8,6 +8,9 @@ import android.widget.AdapterView;
 
 import com.zo2m4bie.firstitemexpandablelistview.view.SelfExpandableListView;
 
+import zo2m4bie.com.myexpandlelistview.adapter.CityAdapter;
+import zo2m4bie.com.myexpandlelistview.model.CityModel;
+
 /**
  * Created by dima on 8/7/16.
  */
@@ -27,19 +30,17 @@ public class HaveMinMaxActivity extends AppCompatActivity {
                 mList.scrollToAnimated(position);
             }
         });
-        String[] testArray = new String[10];
-        testArray[0] = "Test1";
-        testArray[1] = "Test2";
-        testArray[2] = "Test3";
-        testArray[3] = "Test4";
-        testArray[4] = "Test5";
-        testArray[5] = "Test6";
-        testArray[6] = "Test7";
-        testArray[7] = "Test8";
-        testArray[8] = "Test9";
-        testArray[9] = "Test10";
-        mList.setAdapter(new MyAdapter(this,
-                R.layout.item_test,
-                android.R.id.text1, testArray));
+        CityModel[] testArray = new CityModel[10];
+        testArray[0] = new CityModel("Test1", "Test1", R.drawable.ic_launcher);
+        testArray[1] = new CityModel("Test1", "Test1", R.drawable.ic_launcher);
+        testArray[2] = new CityModel("Test1", "Test1", R.drawable.ic_launcher);
+        testArray[3] = new CityModel("Test1", "Test1", R.drawable.ic_launcher);
+        testArray[4] = new CityModel("Test1", "Test1", R.drawable.ic_launcher);
+        testArray[5] = new CityModel("Test1", "Test1", R.drawable.ic_launcher);
+        testArray[6] = new CityModel("Test1", "Test1", R.drawable.ic_launcher);
+        testArray[7] = new CityModel("Test1", "Test1", R.drawable.ic_launcher);
+        testArray[8] = new CityModel("Test1", "Test1", R.drawable.ic_launcher);
+        testArray[9] = new CityModel("Test1", "Test1", R.drawable.ic_launcher);
+        mList.setAdapter(new CityAdapter(this, testArray));
     }
 }

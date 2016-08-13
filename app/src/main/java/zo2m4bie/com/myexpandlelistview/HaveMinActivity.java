@@ -8,6 +8,9 @@ import android.widget.AdapterView;
 
 import com.zo2m4bie.firstitemexpandablelistview.view.SelfExpandableListView;
 
+import zo2m4bie.com.myexpandlelistview.adapter.RecipeAdapter;
+import zo2m4bie.com.myexpandlelistview.model.RecipeModel;
+
 /**
  * Created by dima on 8/7/16.
  */
@@ -27,19 +30,18 @@ public class HaveMinActivity extends AppCompatActivity {
                 mList.scrollToAnimated(position);
             }
         });
-        String[] testArray = new String[10];
-        testArray[0] = "Test1";
-        testArray[1] = "Test2";
-        testArray[2] = "Test3";
-        testArray[3] = "Test4";
-        testArray[4] = "Test5";
-        testArray[5] = "Test6";
-        testArray[6] = "Test7";
-        testArray[7] = "Test8";
-        testArray[8] = "Test9";
-        testArray[9] = "Test10";
-        mList.setAdapter(new MyAdapter(this,
-                R.layout.item_test,
-                android.R.id.text1, testArray));
+        RecipeModel[] testArray = new RecipeModel[10];
+        testArray[0] = new RecipeModel("Test1", R.drawable.ic_launcher);
+        testArray[1] = new RecipeModel("Test1", R.drawable.ic_launcher);;
+        testArray[2] = new RecipeModel("Test1", R.drawable.ic_launcher);;
+        testArray[3] = new RecipeModel("Test1", R.drawable.ic_launcher);;
+        testArray[4] = new RecipeModel("Test1", R.drawable.ic_launcher);;
+        testArray[5] = new RecipeModel("Test1", R.drawable.ic_launcher);;
+        testArray[6] = new RecipeModel("Test1", R.drawable.ic_launcher);;
+        testArray[7] = new RecipeModel("Test1", R.drawable.ic_launcher);;
+        testArray[8] = new RecipeModel("Test1", R.drawable.ic_launcher);;
+        testArray[9] = new RecipeModel("Test1", R.drawable.ic_launcher);;
+        RecipeAdapter adapter = new RecipeAdapter(this, testArray);
+        mList.setAdapter(adapter);
     }
 }
