@@ -22,7 +22,7 @@
         widget:text1="@string/min"
         widget:text2="@string/minmax"
         widget:text3="@string/max"
-        widget:textcolorfrom="@color/colorPrimary"
+        widget:textcolorfrom="@color/unselected_state_color"
         widget:textcolorto="@color/white"/>
 
     <Button
@@ -36,5 +36,7 @@
     <TextView
         android:id="@+id/tv_description"
         android:layout_width="match_parent"
+        android:textColor="@color/black"
+        android:textSize="16sp"
         android:layout_height="match_parent"/>
 </LinearLayout>

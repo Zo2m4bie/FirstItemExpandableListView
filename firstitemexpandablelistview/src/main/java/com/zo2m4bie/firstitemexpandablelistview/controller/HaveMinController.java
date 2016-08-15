@@ -107,7 +107,8 @@ public class HaveMinController implements IMaxMinController {
     @Override
     public int getMaxVauleFor(View child, int itemWidth) {
         child.measure(View.MeasureSpec.EXACTLY | itemWidth, View.MeasureSpec.UNSPECIFIED);
-        return child.getMeasuredHeight();
+        int maxValue = child.getMeasuredHeight();
+        return maxValue > mHalfScreen ? mHalfScreen : maxValue;
     }
 
     @Override
