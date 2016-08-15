@@ -32,16 +32,16 @@ public class HaveMaxActivity extends AppCompatActivity {
             }
         });
         PuzzleModel[] testArray = new PuzzleModel[10];
-        testArray[0] = new PuzzleModel("Test1", "Test1", Color.CYAN);
-        testArray[1] = new PuzzleModel("Test1", "Test1", Color.CYAN);
-        testArray[2] = new PuzzleModel("Test1", "Test1", Color.CYAN);
-        testArray[3] = new PuzzleModel("Test1", "Test1", Color.CYAN);
-        testArray[4] = new PuzzleModel("Test1", "Test1", Color.CYAN);
-        testArray[5] = new PuzzleModel("Test1", "Test1", Color.CYAN);
-        testArray[6] = new PuzzleModel("Test1", "Test1", Color.CYAN);
-        testArray[7] = new PuzzleModel("Test1", "Test1", Color.CYAN);
-        testArray[8] = new PuzzleModel("Test1", "Test1", Color.CYAN);
-        testArray[9] = new PuzzleModel("Test1", "Test1", Color.CYAN);
+        testArray[0] = new PuzzleModel("What is in the middle of Paris?", "The letter \"R\".", Color.CYAN);
+        testArray[1] = new PuzzleModel("What occurs once in a minute, twice in a moment and never in a thousand years?", "The letter \"M\".", Color.BLUE);
+        testArray[2] = new PuzzleModel("What is found over your head but under your hat?", "Your Hair.", Color.parseColor("#fde8e7"));
+        testArray[3] = new PuzzleModel("The more you have of it, the less you see. What is it?", "Darkness.", Color.GREEN);
+        testArray[4] = new PuzzleModel("What English word has three consecutive double letters?", "Bookkeeper", Color.GRAY);
+        testArray[5] = new PuzzleModel("We have legs but cannot walk.", "Tables and chairs.", Color.RED);
+        testArray[6] = new PuzzleModel("Why is a wise man like a pin?", "He has a head and comes to a point.", Color.MAGENTA);
+        testArray[7] = new PuzzleModel("Why don't pigs drive cars?", "They would become road hogs.", Color.YELLOW);
+        testArray[8] = new PuzzleModel("Which alphabet is a hot drink?", "T(tea).", Color.parseColor("#e06b04"));
+        testArray[9] = new PuzzleModel("What asks no question but demands an answer?", "A doorbell.", Color.parseColor("#fcecc9"));
         mList.setAdapter(new PuzzleAdapter(this, testArray));
     }
 }

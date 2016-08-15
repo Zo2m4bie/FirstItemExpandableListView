@@ -14,6 +14,7 @@ public class HaveMinController implements IMaxMinController {
 
     private int mMinValue;
     private int mSecondItemMaxHeight, mFirstItemMaxHeight;
+    private int mHalfScreen;
 
     @Override
     public void init(Context context, AttributeSet attrs) {
@@ -49,6 +50,9 @@ public class HaveMinController implements IMaxMinController {
     public void setSecondItemHeight(View view, int width) {
         view.measure(View.MeasureSpec.EXACTLY | width, View.MeasureSpec.UNSPECIFIED);
         mSecondItemMaxHeight = view.getMeasuredHeight();
+        if(mSecondItemMaxHeight > mHalfScreen){
+            mSecondItemMaxHeight = mHalfScreen;
+        }
     }
 
     @Override
@@ -65,13 +69,18 @@ public class HaveMinController implements IMaxMinController {
     public void measureSecondItem(View tmpView, int width) {
         tmpView.measure(View.MeasureSpec.EXACTLY | width, View.MeasureSpec.UNSPECIFIED);
         mSecondItemMaxHeight = tmpView.getMeasuredHeight();
+        if(mSecondItemMaxHeight > mHalfScreen){
+            mSecondItemMaxHeight = mHalfScreen;
+        }
     }
 
     @Override
     public void measureFirstItemToMax(View tmpView, int width) {
         tmpView.measure(View.MeasureSpec.EXACTLY | width, View.MeasureSpec.UNSPECIFIED);
         mFirstItemMaxHeight = tmpView.getMeasuredHeight();
-        //FIXME have some strange behavior with textview and gravity center if I use UNSPECIFIED
+        if(mFirstItemMaxHeight > mHalfScreen){
+            mFirstItemMaxHeight = mHalfScreen;
+        }
         tmpView.measure(View.MeasureSpec.EXACTLY | width, View.MeasureSpec.EXACTLY | mFirstItemMaxHeight);
     }
 
@@ -79,7 +88,9 @@ public class HaveMinController implements IMaxMinController {
     public void measureFirstItem(View child, int itemWidth) {
         child.measure(View.MeasureSpec.EXACTLY | itemWidth, View.MeasureSpec.UNSPECIFIED);
         mFirstItemMaxHeight = child.getMeasuredHeight();
-        //FIXME have some strange behavior with textview and gravity center if I use UNSPECIFIED
+        if(mFirstItemMaxHeight > mHalfScreen){
+            mFirstItemMaxHeight = mHalfScreen;
+        }
         child.measure(View.MeasureSpec.EXACTLY | itemWidth, View.MeasureSpec.EXACTLY | mFirstItemMaxHeight);
     }
 
@@ -97,5 +108,15 @@ public class HaveMinController implements IMaxMinController {
     public int getMaxVauleFor(View child, int itemWidth) {
         child.measure(View.MeasureSpec.EXACTLY | itemWidth, View.MeasureSpec.UNSPECIFIED);
         return child.getMeasuredHeight();
+    }
+
+    @Override
+    public void setMaxOfMaxHeight(int halfScreen) {
+        mHalfScreen = halfScreen;
+    }
+
+    @Override
+    public int getFirstItemMinValue(View child) {
+        return mMinValue;
     }
 }

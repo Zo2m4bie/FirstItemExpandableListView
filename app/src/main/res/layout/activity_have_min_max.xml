@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         customNS:minMaxType="HAVE_MAX_MIN"
-        customNS:itemMaxHeight="400px"
+        customNS:itemMaxHeight="600px"
         customNS:itemMinHeight="100px"
         />
 

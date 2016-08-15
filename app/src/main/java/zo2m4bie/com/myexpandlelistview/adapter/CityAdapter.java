@@ -33,7 +33,12 @@ public class CityAdapter extends IFirstExpandableAdapter<CityModel> {
         ViewHolder holder = (ViewHolder) convertView.getTag();
         CityModel model = getItem(position);
         holder.setData(model);
-        holder.mPicture.setAlpha((float) percent / 100);
+        float perc = (float) percent / 100;
+        holder.mPicture.setAlpha(perc);
+        if(perc >= 0.5) {
+            holder.mInfo.setVisibility(View.VISIBLE);
+            holder.mInfo.setAlpha((perc - 0.5f) * 2);
+        }
         return convertView;
     }
 
@@ -63,7 +68,10 @@ public class CityAdapter extends IFirstExpandableAdapter<CityModel> {
         @Override
         public void heightPercentage(float percent) {
             mPicture.setAlpha(percent);
-            mInfo.setAlpha(percent);
+            if(percent >= 0.5) {
+                mInfo.setVisibility(View.VISIBLE);
+                mInfo.setAlpha((percent - 0.5f) * 2);
+            }
         }
 
         public void setData(CityModel model) {

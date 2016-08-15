@@ -95,7 +95,8 @@ public class SelfExpandableListView extends AdapterView<IFirstExpandableAdapter>
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        mHalfScreen = heightMeasureSpec / 2;
+        mHalfScreen = getMeasuredHeight() / 2;
+        mMaxMinController.setMaxOfMaxHeight(mHalfScreen);
     }
 
     @Override
@@ -276,7 +277,7 @@ public class SelfExpandableListView extends AdapterView<IFirstExpandableAdapter>
                 }
                 secondItempercent = 1 - ((float)(topUse + height)) / height;
             }else if(index == 1){// second item it have floating height
-                int minV = mMaxMinController.getMinValue(child);
+                int minV = mMaxMinController.getFirstItemMinValue(child);
                 int diff = mMaxMinController.getDifferentMaxMin(minV);
                 height = (int) (diff * secondItempercent);
 

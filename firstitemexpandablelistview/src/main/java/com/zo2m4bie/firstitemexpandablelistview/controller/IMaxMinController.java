@@ -38,4 +38,8 @@ public interface IMaxMinController {
     float getSecondItemMaxValue();
 
     int getMaxVauleFor(View childAt, int itemWidth);
+
+    void setMaxOfMaxHeight(int halfScreen);
+
+    int getFirstItemMinValue(View child);
 }

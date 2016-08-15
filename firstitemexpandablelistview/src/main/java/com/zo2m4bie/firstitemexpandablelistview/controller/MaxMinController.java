@@ -95,4 +95,16 @@ public class MaxMinController implements IMaxMinController {
     public int getMaxVauleFor(View childAt, int itemWidth) {
         return mMaxValue;
     }
+
+    @Override
+    public void setMaxOfMaxHeight(int halfScreen) {
+        if(mMaxValue > halfScreen){
+            mMaxValue = halfScreen;
+        }
+    }
+
+    @Override
+    public int getFirstItemMinValue(View child) {
+        return mMinValue;
+    }
 }

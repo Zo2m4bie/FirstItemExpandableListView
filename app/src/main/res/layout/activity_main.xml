@@ -23,13 +23,14 @@
         widget:text2="@string/minmax"
         widget:text3="@string/max"
         widget:textcolorfrom="@color/colorPrimary"
-        widget:textcolorto="@color/colorAccent"/>
+        widget:textcolorto="@color/white"/>
 
     <Button
         android:id="@+id/start_activity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:text="@string/show_preview"
         android:layout_margin="10dp"/>
 
     <TextView

@@ -56,10 +56,10 @@ public class PuzzleAdapter  extends IFirstExpandableAdapter<PuzzleModel> {
     static class ViewHolder implements ISelfExpandableHolder {
         private TextView mPuzzle;
         private TextView mAnswer;
-        private LinearLayout mMainLayout;
+        private RelativeLayout mMainLayout;
 
         public ViewHolder(View view) {
-            mMainLayout = (LinearLayout) view.findViewById(R.id.main_layout);
+            mMainLayout = (RelativeLayout) view.findViewById(R.id.main_layout);
             mPuzzle = (TextView) view.findViewById(R.id.puzzle);
             mAnswer = (TextView) view.findViewById(R.id.answer);
         }
@@ -69,6 +69,8 @@ public class PuzzleAdapter  extends IFirstExpandableAdapter<PuzzleModel> {
             if(percent >= 0.5) {
                 mAnswer.setVisibility(View.VISIBLE);
                 mAnswer.setAlpha((percent - 0.5f) * 2);
+            } else {
+                mAnswer.setVisibility(View.GONE);
             }
         }
 

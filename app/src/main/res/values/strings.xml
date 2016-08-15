@@ -3,10 +3,11 @@
     <string name="min">Min</string>
     <string name="minmax">MinMax</string>
     <string name="max">Max</string>
+    <string name="show_preview">Show Preview</string>
 
     <string-array name="description_array">
-        <item>Selected min state</item>
-        <item>Selected min max state</item>
-        <item>Selected max state</item>
+        <item>In this case list has only min value. So it will use item size as maximum.</item>
+        <item>In this case list has max and min valuee. So list items will start from set min value and their height will grow when user will scroll list.</item>
+        <item>In this case list has only min value. So it will use measuered size of item as min value.</item>
     </string-array>
 </resources>

@@ -31,16 +31,16 @@ public class HaveMinActivity extends AppCompatActivity {
             }
         });
         RecipeModel[] testArray = new RecipeModel[10];
-        testArray[0] = new RecipeModel("Test1", R.drawable.ic_launcher);
-        testArray[1] = new RecipeModel("Test1", R.drawable.ic_launcher);;
-        testArray[2] = new RecipeModel("Test1", R.drawable.ic_launcher);;
-        testArray[3] = new RecipeModel("Test1", R.drawable.ic_launcher);;
-        testArray[4] = new RecipeModel("Test1", R.drawable.ic_launcher);;
-        testArray[5] = new RecipeModel("Test1", R.drawable.ic_launcher);;
-        testArray[6] = new RecipeModel("Test1", R.drawable.ic_launcher);;
-        testArray[7] = new RecipeModel("Test1", R.drawable.ic_launcher);;
-        testArray[8] = new RecipeModel("Test1", R.drawable.ic_launcher);;
-        testArray[9] = new RecipeModel("Test1", R.drawable.ic_launcher);;
+        testArray[0] = new RecipeModel("Smokey Salmon", R.drawable.smokey_salmon);
+        testArray[1] = new RecipeModel("Tuna Macaroni Salad", R.drawable.tuna_sal);;
+        testArray[2] = new RecipeModel("Smothered Beef Short Ribs", R.drawable.beef_ribs);;
+        testArray[3] = new RecipeModel("Chicken Breast Cutlets with Artichokes and Capers", R.drawable.chicken_breast);;
+        testArray[4] = new RecipeModel("Marinated Grilled Pork Tenderloin", R.drawable.marinated_grilled_pork);;
+        testArray[5] = new RecipeModel("Oat and Blueberry Muffins", R.drawable.maffins);;
+        testArray[6] = new RecipeModel("Breakfast Cups", R.drawable.ic_launcher);;
+        testArray[7] = new RecipeModel("Blueberry Banana Breakfast Bars", R.drawable.breakfast_bars);;
+        testArray[8] = new RecipeModel("Emmi’s Banana Wraps", R.drawable.wraps);;
+        testArray[9] = new RecipeModel("Sassy Sangria", R.drawable.sassy_sangria);;
         RecipeAdapter adapter = new RecipeAdapter(this, testArray);
         mList.setAdapter(adapter);
     }

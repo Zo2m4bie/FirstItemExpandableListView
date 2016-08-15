@@ -14,6 +14,7 @@ import com.zo2m4bie.firstitemexpandablelistview.R;
 public class HaveMaxController implements IMaxMinController {
 
     private int mMaxValue, mHalfMax;
+    private int mSecondItemMinHeight, mFirstItemMiHeight;
     private int mSecondItemHeight;
 
     @Override
@@ -53,7 +54,8 @@ public class HaveMaxController implements IMaxMinController {
 
     @Override
     public void setSecondItemHeight(View view, int width) {
-        mSecondItemHeight = view.getMeasuredHeight();
+        view.measure(View.MeasureSpec.EXACTLY | width, View.MeasureSpec.UNSPECIFIED);
+        mSecondItemMinHeight = view.getMeasuredHeight();
     }
 
     @Override
@@ -97,5 +99,15 @@ public class HaveMaxController implements IMaxMinController {
         return mMaxValue;
     }
 
+    @Override
+    public void setMaxOfMaxHeight(int halfScreen) {
+        if(mMaxValue > halfScreen){
+            mMaxValue = halfScreen;
+        }
+    }
 
+    @Override
+    public int getFirstItemMinValue(View child) {
+        return mSecondItemMinHeight;
+    }
 }
