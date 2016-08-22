@@ -2,6 +2,8 @@
 
 This is a list view which expand first item while user scroll this list.
 
+![](https://github.com/Zo2m4bie/MyExpandleListView/blob/master/ezgif-3966487148.gif)
+
 # Usage
 
 For working implementation of this project see the `/app` folder.
